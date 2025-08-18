@@ -1,10 +1,8 @@
 # Rare Server
-<!-- TODO: Add a description of the Rare application -->
 
-## Getting Started:
-1. Run `pipenv shell` to start the virtual environment
-1. Run `pipenv install` to install the dependencies
-1. Create a `db.sqlite3` file
-1. Run the commands in the `loaddata.sql` file to create the tables in the database
-<!-- TODO: As more of the project is filled in add the other steps to get this project running -->
 
+## Getting Started
+
+This repository is just a template with a single, valuable file—the `.sql` file which shows a sample about how *some* of the tables could be created. This is not a finished, completed file and it is up to the team whether or not you want to use it.
+
+Follow the steps from the course to create a new `dotnet` minimal API project to get started.
