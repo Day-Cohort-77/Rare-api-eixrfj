@@ -1,6 +1,0 @@
-@Rare_HostAddress = http://localhost:5015
-
-GET {{Rare_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
