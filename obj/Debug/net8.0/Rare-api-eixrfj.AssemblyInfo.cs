@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Rare-api-eixrfj")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+894305f22f1685838426d7e2aa631b54dbaecb17")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9fe61340985f67fbf60f12560a1d191bc606160e")]
 [assembly: System.Reflection.AssemblyProductAttribute("Rare-api-eixrfj")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Rare-api-eixrfj")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -1,25 +1,31 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\ksimo\\workspace\\csharp\\rare\\Rare-api-eixrfj\\Rare-api-eixrfj.csproj": {}
+    "C:\\Users\\dylan\\workspace\\Rare-api-eixrfj\\Rare-api-eixrfj.csproj": {}
   },
   "projects": {
-    "C:\\Users\\ksimo\\workspace\\csharp\\rare\\Rare-api-eixrfj\\Rare-api-eixrfj.csproj": {
+    "C:\\Users\\dylan\\workspace\\Rare-api-eixrfj\\Rare-api-eixrfj.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\ksimo\\workspace\\csharp\\rare\\Rare-api-eixrfj\\Rare-api-eixrfj.csproj",
+        "projectUniqueName": "C:\\Users\\dylan\\workspace\\Rare-api-eixrfj\\Rare-api-eixrfj.csproj",
         "projectName": "Rare-api-eixrfj",
-        "projectPath": "C:\\Users\\ksimo\\workspace\\csharp\\rare\\Rare-api-eixrfj\\Rare-api-eixrfj.csproj",
-        "packagesPath": "C:\\Users\\ksimo\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\ksimo\\workspace\\csharp\\rare\\Rare-api-eixrfj\\obj\\",
+        "projectPath": "C:\\Users\\dylan\\workspace\\Rare-api-eixrfj\\Rare-api-eixrfj.csproj",
+        "packagesPath": "C:\\Users\\dylan\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\dylan\\workspace\\Rare-api-eixrfj\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\ksimo\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\dylan\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -37,7 +43,8 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        }
+        },
+        "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
         "net8.0": {
@@ -75,7 +82,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.412/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
