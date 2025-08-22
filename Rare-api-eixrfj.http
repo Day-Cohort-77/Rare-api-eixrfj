@@ -1,6 +1,0 @@
-@Rare_api_eixfj_HostAddress = http://localhost:5241
-
-GET {{Rare_api_eixfj_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

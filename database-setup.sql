@@ -1,82 +1,98 @@
-CREATE TABLE IF NOT EXISTS "Users" (
-    "id" SERIAL PRIMARY KEY,
-    "first_name" varchar,
-    "last_name" varchar,
-    "email" varchar,
-    "bio" varchar,
-    "username" varchar,
-    "password" varchar,
-    "profile_image_url" varchar,
-    "created_on" date,
-    "active" bit
+-- Drop and recreate Users table with correct columns (dev only, this will delete all user data!)
+DROP TABLE IF EXISTS Users CASCADE;
+CREATE TABLE IF NOT EXISTS Users (
+    id SERIAL PRIMARY KEY,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    bio VARCHAR(255),
+    username VARCHAR(100) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    profile_image_url VARCHAR(255),
+    created_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    active BOOLEAN NOT NULL DEFAULT true
 );
-CREATE TABLE IF NOT EXISTS "DemotionQueue" (
-    "action" varchar,
-    "admin_id" INTEGER,
-    "approver_one_id" INTEGER,
-    FOREIGN KEY("admin_id") REFERENCES "Users"("id"),
-    FOREIGN KEY("approver_one_id") REFERENCES "Users"("id"),
-    PRIMARY KEY (action, admin_id, approver_one_id)
+-- Drop Posts table if it exists (dev only, this will delete all post data!)
+DROP TABLE IF EXISTS Posts CASCADE;
+-- Create Posts table for RareAPI
+CREATE TABLE IF NOT EXISTS Posts (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES Users(id) ON DELETE CASCADE,
+    category_id INTEGER NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    publication_date DATE NOT NULL,
+    image_url VARCHAR(255),
+    content VARCHAR(1000) NOT NULL,
+    approved BOOLEAN
 );
-CREATE TABLE IF NOT EXISTS "Subscriptions" (
-    "id" SERIAL PRIMARY KEY,
-    "follower_id" INTEGER,
-    "author_id" INTEGER,
-    "created_on" date,
-    FOREIGN KEY("follower_id") REFERENCES "Users"("id"),
-    FOREIGN KEY("author_id") REFERENCES "Users"("id")
-);
-CREATE TABLE IF NOT EXISTS "Posts" (
-    "id" SERIAL PRIMARY KEY,
-    "user_id" INTEGER,
-    "category_id" INTEGER,
-    "title" varchar,
-    "publication_date" date,
-    "image_url" varchar,
-    "content" varchar,
-    "approved" bit,
-    FOREIGN KEY("user_id") REFERENCES "Users"("id")
-);
-CREATE TABLE IF NOT EXISTS "Comments" (
-    "id" SERIAL PRIMARY KEY,
-    "post_id" INTEGER,
-    "author_id" INTEGER,
-    "content" varchar,
-    FOREIGN KEY("post_id") REFERENCES "Posts"("id"),
-    FOREIGN KEY("author_id") REFERENCES "Users"("id")
-);
-CREATE TABLE IF NOT EXISTS "Reactions" (
-    "id" SERIAL PRIMARY KEY,
-    "label" varchar,
-    "image_url" varchar
-);
-CREATE TABLE IF NOT EXISTS "PostReactions" (
-    "id" SERIAL PRIMARY KEY,
-    "user_id" INTEGER,
-    "reaction_id" INTEGER,
-    "post_id" INTEGER,
-    FOREIGN KEY("user_id") REFERENCES "Users"("id"),
-    FOREIGN KEY("reaction_id") REFERENCES "Reactions"("id"),
-    FOREIGN KEY("post_id") REFERENCES "Posts"("id")
-);
-CREATE TABLE IF NOT EXISTS "Tags" (
-    "id" SERIAL PRIMARY KEY,
-    "label" varchar
-);
-CREATE TABLE IF NOT EXISTS "PostTags" (
-    "id" SERIAL PRIMARY KEY,
-    "post_id" INTEGER,
-    "tag_id" INTEGER,
-    FOREIGN KEY("post_id") REFERENCES "Posts"("id"),
-    FOREIGN KEY("tag_id") REFERENCES "Tags"("id")
-);
-CREATE TABLE IF NOT EXISTS "Categories" (
-    "id" SERIAL PRIMARY KEY,
-    "label" varchar
-);
-INSERT INTO "Categories" ("label")
-VALUES ('News');
-INSERT INTO "Tags" ("label")
-VALUES ('JavaScript');
-INSERT INTO "Reactions" ("label", "image_url")
-VALUES ('happy', 'https://pngtree.com/so/happy');
+-- Insert a test user (password is 'password123')
+INSERT INTO Users (
+        first_name,
+        last_name,
+        email,
+        bio,
+        username,
+        password,
+        profile_image_url,
+        created_on,
+        active
+    )
+VALUES (
+        'John',
+        'Doe',
+        'john.doe@example.com',
+        'Test bio for John',
+        'johndoe',
+        'password123',
+        'https://example.com/john.jpg',
+        CURRENT_TIMESTAMP,
+        true
+    ),
+    (
+        'Alice',
+        'Smith',
+        'alice@example.com',
+        'Test bio for Alice',
+        'alicesmith',
+        'password',
+        'https://example.com/alice.jpg',
+        CURRENT_TIMESTAMP,
+        true
+    ) ON CONFLICT (email) DO NOTHING;
+-- Insert some test posts
+INSERT INTO Posts (
+        user_id,
+        category_id,
+        title,
+        publication_date,
+        image_url,
+        content,
+        approved
+    )
+VALUES (
+        1,
+        1,
+        'My First Post',
+        '2025-08-22',
+        'https://example.com/image1.jpg',
+        'This is the content of my first post. It''s quite exciting!',
+        true
+    ),
+    (
+        1,
+        2,
+        'Draft Post',
+        '2025-08-21',
+        'https://example.com/image2.jpg',
+        'This is a draft post that hasn''t been published yet.',
+        false
+    ),
+    (
+        1,
+        1,
+        'Another Published Post',
+        '2025-08-20',
+        'https://example.com/image3.jpg',
+        'Here''s another post with some interesting content.',
+        true
+    ) ON CONFLICT DO NOTHING;
