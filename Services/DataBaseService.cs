@@ -39,26 +39,10 @@ namespace RareAPI.Services
 
         public async Task InitializeDatabaseAsync()
         {
-            // First, create the database if it doesn't exist
-            using var connection = new NpgsqlConnection(_connectionString.Replace("Database=rare", "Database=postgres"));
+            // Run table creation and seeding on the configured database
+            using var connection = CreateConnection();
             await connection.OpenAsync();
 
-            // Check if database exists
-            using var checkCommand = new NpgsqlCommand(
-                "SELECT 1 FROM pg_database WHERE datname = 'rare'",
-                connection);
-            var exists = await checkCommand.ExecuteScalarAsync();
-
-            if (exists == null)
-            {
-                // Create the database
-                using var createDbCommand = new NpgsqlCommand(
-                    "CREATE DATABASE rare",
-                    connection);
-                await createDbCommand.ExecuteNonQueryAsync();
-            }
-
-            // Now connect to the harbormaster database and create tables
             string sql = File.ReadAllText("database-setup.sql");
             await ExecuteNonQueryAsync(sql);
         }
@@ -69,7 +53,7 @@ namespace RareAPI.Services
             using var connection = CreateConnection();
             await connection.OpenAsync();
 
-            using var command = new NpgsqlCommand("SELECT COUNT(*) FROM Users WHERE Email = @email", connection);
+            using var command = new NpgsqlCommand("SELECT COUNT(*) FROM Users WHERE email = @email", connection);
             command.Parameters.AddWithValue("@email", email);
 
             var result = await command.ExecuteScalarAsync();
@@ -82,17 +66,20 @@ namespace RareAPI.Services
             await connection.OpenAsync();
 
             var insertSql = @"
-                INSERT INTO Users (FirstName, LastName, Email, Password, CreatedOn, IsActive)
-                VALUES (@firstName, @lastName, @email, @password, @createdOn, @isActive)
-                RETURNING Id, FirstName, LastName, Email, CreatedOn, IsActive";
+                INSERT INTO Users (first_name, last_name, email, bio, username, password, profile_image_url, created_on, active)
+                VALUES (@first_name, @last_name, @email, @bio, @username, @password, @profile_image_url, @created_on, @active)
+                RETURNING id, first_name, last_name, email, bio, username, password, profile_image_url, created_on, active";
 
             using var command = new NpgsqlCommand(insertSql, connection);
-            command.Parameters.AddWithValue("@firstName", newUser.FirstName);
-            command.Parameters.AddWithValue("@lastName", newUser.LastName);
+            command.Parameters.AddWithValue("@first_name", newUser.First_Name);
+            command.Parameters.AddWithValue("@last_name", newUser.Last_Name);
             command.Parameters.AddWithValue("@email", newUser.Email);
+            command.Parameters.AddWithValue("@bio", newUser.Bio);
+            command.Parameters.AddWithValue("@username", newUser.Username);
             command.Parameters.AddWithValue("@password", newUser.Password);
-            command.Parameters.AddWithValue("@createdOn", DateTime.UtcNow);
-            command.Parameters.AddWithValue("@isActive", true);
+            command.Parameters.AddWithValue("@profile_image_url", newUser.Profile_Image_Url);
+            command.Parameters.AddWithValue("@created_on", DateTime.UtcNow);
+            command.Parameters.AddWithValue("@active", newUser.Active);
 
             using var reader = await command.ExecuteReaderAsync();
             if (await reader.ReadAsync())
@@ -100,12 +87,15 @@ namespace RareAPI.Services
                 return new User
                 {
                     Id = reader.GetInt32(0),
-                    FirstName = reader.GetString(1),
-                    LastName = reader.GetString(2),
+                    First_Name = reader.GetString(1),
+                    Last_Name = reader.GetString(2),
                     Email = reader.GetString(3),
-                    CreatedOn = reader.GetDateTime(4),
-                    IsActive = reader.GetBoolean(5)
-                    // Don't return password
+                    Bio = reader.GetString(4),
+                    Username = reader.GetString(5),
+                    Password = reader.GetString(6),
+                    Profile_Image_Url = reader.GetString(7),
+                    Created_On = reader.GetDateTime(8),
+                    Active = reader.GetBoolean(9)
                 };
             }
 
@@ -117,7 +107,7 @@ namespace RareAPI.Services
             using var connection = CreateConnection();
             await connection.OpenAsync();
 
-            var sql = "SELECT Id, Password FROM Users WHERE Email = @email AND IsActive = true";
+            var sql = "SELECT id, password FROM Users WHERE email = @email AND active = true";
             using var command = new NpgsqlCommand(sql, connection);
             command.Parameters.AddWithValue("@email", email);
 
@@ -135,7 +125,7 @@ namespace RareAPI.Services
             using var connection = CreateConnection();
             await connection.OpenAsync();
 
-            var sql = "SELECT Id, FirstName, LastName, Email, CreatedOn, IsActive FROM Users WHERE Id = @id";
+            var sql = "SELECT id, first_name, last_name, email, bio, username, password, profile_image_url, created_on, active FROM Users WHERE id = @id";
             using var command = new NpgsqlCommand(sql, connection);
             command.Parameters.AddWithValue("@id", id);
 
@@ -145,12 +135,15 @@ namespace RareAPI.Services
                 return new User
                 {
                     Id = reader.GetInt32(0),
-                    FirstName = reader.GetString(1),
-                    LastName = reader.GetString(2),
+                    First_Name = reader.GetString(1),
+                    Last_Name = reader.GetString(2),
                     Email = reader.GetString(3),
-                    CreatedOn = reader.GetDateTime(4),
-                    IsActive = reader.GetBoolean(5)
-                    // Don't return password
+                    Bio = reader.GetString(4),
+                    Username = reader.GetString(5),
+                    Password = reader.GetString(6),
+                    Profile_Image_Url = reader.GetString(7),
+                    Created_On = reader.GetDateTime(8),
+                    Active = reader.GetBoolean(9)
                 };
             }
 
@@ -164,7 +157,7 @@ namespace RareAPI.Services
             using var connection = CreateConnection();
             await connection.OpenAsync();
 
-            using var command = new NpgsqlCommand("SELECT Id, FirstName, LastName, Email, CreatedOn, IsActive FROM Users WHERE IsActive = true", connection);
+            using var command = new NpgsqlCommand("SELECT id, first_name, last_name, email, bio, username, password, profile_image_url, created_on, active FROM Users WHERE active = true", connection);
             using var reader = await command.ExecuteReaderAsync();
 
             while (await reader.ReadAsync())
@@ -172,12 +165,15 @@ namespace RareAPI.Services
                 users.Add(new User
                 {
                     Id = reader.GetInt32(0),
-                    FirstName = reader.GetString(1),
-                    LastName = reader.GetString(2),
+                    First_Name = reader.GetString(1),
+                    Last_Name = reader.GetString(2),
                     Email = reader.GetString(3),
-                    CreatedOn = reader.GetDateTime(4),
-                    IsActive = reader.GetBoolean(5)
-                    // Don't return password
+                    Bio = reader.GetString(4),
+                    Username = reader.GetString(5),
+                    Password = reader.GetString(6),
+                    Profile_Image_Url = reader.GetString(7),
+                    Created_On = reader.GetDateTime(8),
+                    Active = reader.GetBoolean(9)
                 });
             }
 

@@ -6,7 +6,7 @@
             "port": 5432,
             "driver": "PostgreSQL",
             "name": "rare",
-            "database": "raredb",
+            "database": "rare",
             "username": "postgres"
         }
     ]

@@ -1,11 +1,16 @@
+-- Drop and recreate Users table with correct columns (dev only, this will delete all user data!)
+DROP TABLE IF EXISTS Users CASCADE;
 CREATE TABLE IF NOT EXISTS Users (
-    Id SERIAL PRIMARY KEY,
-    FirstName VARCHAR(100) NOT NULL,
-    LastName VARCHAR(100) NOT NULL,
-    Email VARCHAR(255) UNIQUE NOT NULL,
-    Password VARCHAR(255) NOT NULL,
-    CreatedOn TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    IsActive BOOLEAN NOT NULL DEFAULT true
+    id SERIAL PRIMARY KEY,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    bio VARCHAR(255),
+    username VARCHAR(100) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    profile_image_url VARCHAR(255),
+    created_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    active BOOLEAN NOT NULL DEFAULT true
 );
 -- Create Posts table for RareAPI
 CREATE TABLE IF NOT EXISTS Posts (
@@ -19,21 +24,38 @@ CREATE TABLE IF NOT EXISTS Posts (
 );
 -- Insert a test user (password is 'password123')
 INSERT INTO Users (
-        FirstName,
-        LastName,
-        Email,
-        Password,
-        CreatedOn,
-        IsActive
+        first_name,
+        last_name,
+        email,
+        bio,
+        username,
+        password,
+        profile_image_url,
+        created_on,
+        active
     )
 VALUES (
         'John',
         'Doe',
         'john.doe@example.com',
+        'Test bio for John',
+        'johndoe',
         'password123',
+        'https://example.com/john.jpg',
         CURRENT_TIMESTAMP,
         true
-    );
+    ),
+    (
+        'Alice',
+        'Smith',
+        'alice@example.com',
+        'Test bio for Alice',
+        'alicesmith',
+        'password',
+        'https://example.com/alice.jpg',
+        CURRENT_TIMESTAMP,
+        true
+    ) ON CONFLICT (email) DO NOTHING;
 -- Insert some test posts
 INSERT INTO Posts (Title, Content, UserId, CreatedOn, IsPublished)
 VALUES (
