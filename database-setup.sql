@@ -12,15 +12,18 @@ CREATE TABLE IF NOT EXISTS Users (
     created_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     active BOOLEAN NOT NULL DEFAULT true
 );
+-- Drop Posts table if it exists (dev only, this will delete all post data!)
+DROP TABLE IF EXISTS Posts CASCADE;
 -- Create Posts table for RareAPI
 CREATE TABLE IF NOT EXISTS Posts (
-    Id SERIAL PRIMARY KEY,
-    Title VARCHAR(255) NOT NULL,
-    Content TEXT NOT NULL,
-    UserId INTEGER NOT NULL REFERENCES Users(Id) ON DELETE CASCADE,
-    CreatedOn TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    UpdatedOn TIMESTAMP NULL,
-    IsPublished BOOLEAN NOT NULL DEFAULT false
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES Users(id) ON DELETE CASCADE,
+    category_id INTEGER NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    publication_date DATE NOT NULL,
+    image_url VARCHAR(255),
+    content VARCHAR(1000) NOT NULL,
+    approved BOOLEAN
 );
 -- Insert a test user (password is 'password123')
 INSERT INTO Users (
@@ -57,25 +60,39 @@ VALUES (
         true
     ) ON CONFLICT (email) DO NOTHING;
 -- Insert some test posts
-INSERT INTO Posts (Title, Content, UserId, CreatedOn, IsPublished)
+INSERT INTO Posts (
+        user_id,
+        category_id,
+        title,
+        publication_date,
+        image_url,
+        content,
+        approved
+    )
 VALUES (
-        'My First Post',
-        'This is the content of my first post. It''s quite exciting!',
         1,
-        CURRENT_TIMESTAMP,
+        1,
+        'My First Post',
+        '2025-08-22',
+        'https://example.com/image1.jpg',
+        'This is the content of my first post. It''s quite exciting!',
         true
     ),
     (
-        'Draft Post',
-        'This is a draft post that hasn''t been published yet.',
         1,
-        CURRENT_TIMESTAMP,
+        2,
+        'Draft Post',
+        '2025-08-21',
+        'https://example.com/image2.jpg',
+        'This is a draft post that hasn''t been published yet.',
         false
     ),
     (
-        'Another Published Post',
-        'Here''s another post with some interesting content.',
         1,
-        CURRENT_TIMESTAMP,
+        1,
+        'Another Published Post',
+        '2025-08-20',
+        'https://example.com/image3.jpg',
+        'Here''s another post with some interesting content.',
         true
-    );
+    ) ON CONFLICT DO NOTHING;

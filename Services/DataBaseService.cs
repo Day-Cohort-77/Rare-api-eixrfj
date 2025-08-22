@@ -188,7 +188,7 @@ namespace RareAPI.Services
             using var connection = CreateConnection();
             await connection.OpenAsync();
 
-            using var command = new NpgsqlCommand("SELECT Id, Title, Content, UserId, CreatedOn, UpdatedOn, IsPublished FROM Posts ORDER BY CreatedOn DESC", connection);
+            using var command = new NpgsqlCommand("SELECT id, user_id, category_id, title, publication_date, image_url, content, approved FROM Posts ORDER BY publication_date DESC", connection);
             using var reader = await command.ExecuteReaderAsync();
 
             while (await reader.ReadAsync())
@@ -196,12 +196,13 @@ namespace RareAPI.Services
                 posts.Add(new Post
                 {
                     Id = reader.GetInt32(0),
-                    Title = reader.GetString(1),
-                    Content = reader.GetString(2),
-                    UserId = reader.GetInt32(3),
-                    CreatedOn = reader.GetDateTime(4),
-                    UpdatedOn = reader.IsDBNull(5) ? null : reader.GetDateTime(5),
-                    IsPublished = reader.GetBoolean(6)
+                    User_Id = reader.GetInt32(1),
+                    Category_Id = reader.GetInt32(2),
+                    Title = reader.GetString(3),
+                    Publication_Date = reader.GetDateTime(4),
+                    Image_Url = reader.GetString(5),
+                    Content = reader.GetString(6),
+                    Approved = reader.IsDBNull(7) ? (bool?)null : reader.GetBoolean(7)
                 });
             }
 
@@ -213,7 +214,7 @@ namespace RareAPI.Services
             using var connection = CreateConnection();
             await connection.OpenAsync();
 
-            var sql = "SELECT Id, Title, Content, UserId, CreatedOn, UpdatedOn, IsPublished FROM Posts WHERE Id = @id";
+            var sql = "SELECT id, user_id, category_id, title, publication_date, image_url, content, approved FROM Posts WHERE id = @id";
             using var command = new NpgsqlCommand(sql, connection);
             command.Parameters.AddWithValue("@id", id);
 
@@ -223,12 +224,13 @@ namespace RareAPI.Services
                 return new Post
                 {
                     Id = reader.GetInt32(0),
-                    Title = reader.GetString(1),
-                    Content = reader.GetString(2),
-                    UserId = reader.GetInt32(3),
-                    CreatedOn = reader.GetDateTime(4),
-                    UpdatedOn = reader.IsDBNull(5) ? null : reader.GetDateTime(5),
-                    IsPublished = reader.GetBoolean(6)
+                    User_Id = reader.GetInt32(1),
+                    Category_Id = reader.GetInt32(2),
+                    Title = reader.GetString(3),
+                    Publication_Date = reader.GetDateTime(4),
+                    Image_Url = reader.GetString(5),
+                    Content = reader.GetString(6),
+                    Approved = reader.IsDBNull(7) ? (bool?)null : reader.GetBoolean(7)
                 };
             }
 
@@ -241,16 +243,18 @@ namespace RareAPI.Services
             await connection.OpenAsync();
 
             var insertSql = @"
-                INSERT INTO Posts (Title, Content, UserId, CreatedOn, IsPublished)
-                VALUES (@title, @content, @userId, @createdOn, @isPublished)
-                RETURNING Id, Title, Content, UserId, CreatedOn, UpdatedOn, IsPublished";
+                INSERT INTO Posts (user_id, category_id, title, publication_date, image_url, content, approved)
+                VALUES (@user_id, @category_id, @title, @publication_date, @image_url, @content, @approved)
+                RETURNING id, user_id, category_id, title, publication_date, image_url, content, approved";
 
             using var command = new NpgsqlCommand(insertSql, connection);
+            command.Parameters.AddWithValue("@user_id", newPost.User_Id);
+            command.Parameters.AddWithValue("@category_id", newPost.Category_Id);
             command.Parameters.AddWithValue("@title", newPost.Title);
+            command.Parameters.AddWithValue("@publication_date", newPost.Publication_Date);
+            command.Parameters.AddWithValue("@image_url", newPost.Image_Url);
             command.Parameters.AddWithValue("@content", newPost.Content);
-            command.Parameters.AddWithValue("@userId", newPost.UserId);
-            command.Parameters.AddWithValue("@createdOn", DateTime.UtcNow);
-            command.Parameters.AddWithValue("@isPublished", newPost.IsPublished);
+            command.Parameters.AddWithValue("@approved", (object?)newPost.Approved ?? DBNull.Value);
 
             using var reader = await command.ExecuteReaderAsync();
             if (await reader.ReadAsync())
@@ -258,12 +262,13 @@ namespace RareAPI.Services
                 return new Post
                 {
                     Id = reader.GetInt32(0),
-                    Title = reader.GetString(1),
-                    Content = reader.GetString(2),
-                    UserId = reader.GetInt32(3),
-                    CreatedOn = reader.GetDateTime(4),
-                    UpdatedOn = reader.IsDBNull(5) ? null : reader.GetDateTime(5),
-                    IsPublished = reader.GetBoolean(6)
+                    User_Id = reader.GetInt32(1),
+                    Category_Id = reader.GetInt32(2),
+                    Title = reader.GetString(3),
+                    Publication_Date = reader.GetDateTime(4),
+                    Image_Url = reader.GetString(5),
+                    Content = reader.GetString(6),
+                    Approved = reader.IsDBNull(7) ? (bool?)null : reader.GetBoolean(7)
                 };
             }
 
@@ -277,16 +282,19 @@ namespace RareAPI.Services
 
             var updateSql = @"
                 UPDATE Posts
-                SET Title = @title, Content = @content, UpdatedOn = @updatedOn, IsPublished = @isPublished
-                WHERE Id = @id
-                RETURNING Id, Title, Content, UserId, CreatedOn, UpdatedOn, IsPublished";
+                SET user_id = @user_id, category_id = @category_id, title = @title, publication_date = @publication_date, image_url = @image_url, content = @content, approved = @approved
+                WHERE id = @id
+                RETURNING id, user_id, category_id, title, publication_date, image_url, content, approved";
 
             using var command = new NpgsqlCommand(updateSql, connection);
             command.Parameters.AddWithValue("@id", id);
+            command.Parameters.AddWithValue("@user_id", updatedPost.User_Id);
+            command.Parameters.AddWithValue("@category_id", updatedPost.Category_Id);
             command.Parameters.AddWithValue("@title", updatedPost.Title);
+            command.Parameters.AddWithValue("@publication_date", updatedPost.Publication_Date);
+            command.Parameters.AddWithValue("@image_url", updatedPost.Image_Url);
             command.Parameters.AddWithValue("@content", updatedPost.Content);
-            command.Parameters.AddWithValue("@updatedOn", DateTime.UtcNow);
-            command.Parameters.AddWithValue("@isPublished", updatedPost.IsPublished);
+            command.Parameters.AddWithValue("@approved", (object?)updatedPost.Approved ?? DBNull.Value);
 
             using var reader = await command.ExecuteReaderAsync();
             if (await reader.ReadAsync())
@@ -294,12 +302,13 @@ namespace RareAPI.Services
                 return new Post
                 {
                     Id = reader.GetInt32(0),
-                    Title = reader.GetString(1),
-                    Content = reader.GetString(2),
-                    UserId = reader.GetInt32(3),
-                    CreatedOn = reader.GetDateTime(4),
-                    UpdatedOn = reader.IsDBNull(5) ? null : reader.GetDateTime(5),
-                    IsPublished = reader.GetBoolean(6)
+                    User_Id = reader.GetInt32(1),
+                    Category_Id = reader.GetInt32(2),
+                    Title = reader.GetString(3),
+                    Publication_Date = reader.GetDateTime(4),
+                    Image_Url = reader.GetString(5),
+                    Content = reader.GetString(6),
+                    Approved = reader.IsDBNull(7) ? (bool?)null : reader.GetBoolean(7)
                 };
             }
 
@@ -311,7 +320,7 @@ namespace RareAPI.Services
             using var connection = CreateConnection();
             await connection.OpenAsync();
 
-            var deleteSql = "DELETE FROM Posts WHERE Id = @id";
+            var deleteSql = "DELETE FROM Posts WHERE id = @id";
             using var command = new NpgsqlCommand(deleteSql, connection);
             command.Parameters.AddWithValue("@id", id);
 
@@ -326,9 +335,9 @@ namespace RareAPI.Services
             using var connection = CreateConnection();
             await connection.OpenAsync();
 
-            var sql = "SELECT Id, Title, Content, UserId, CreatedOn, UpdatedOn, IsPublished FROM Posts WHERE UserId = @userId ORDER BY CreatedOn DESC";
+            var sql = "SELECT id, user_id, category_id, title, publication_date, image_url, content, approved FROM Posts WHERE user_id = @user_id ORDER BY publication_date DESC";
             using var command = new NpgsqlCommand(sql, connection);
-            command.Parameters.AddWithValue("@userId", userId);
+            command.Parameters.AddWithValue("@user_id", userId);
 
             using var reader = await command.ExecuteReaderAsync();
             while (await reader.ReadAsync())
@@ -336,12 +345,13 @@ namespace RareAPI.Services
                 posts.Add(new Post
                 {
                     Id = reader.GetInt32(0),
-                    Title = reader.GetString(1),
-                    Content = reader.GetString(2),
-                    UserId = reader.GetInt32(3),
-                    CreatedOn = reader.GetDateTime(4),
-                    UpdatedOn = reader.IsDBNull(5) ? null : reader.GetDateTime(5),
-                    IsPublished = reader.GetBoolean(6)
+                    User_Id = reader.GetInt32(1),
+                    Category_Id = reader.GetInt32(2),
+                    Title = reader.GetString(3),
+                    Publication_Date = reader.GetDateTime(4),
+                    Image_Url = reader.GetString(5),
+                    Content = reader.GetString(6),
+                    Approved = reader.IsDBNull(7) ? (bool?)null : reader.GetBoolean(7)
                 });
             }
 

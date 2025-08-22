@@ -68,7 +68,7 @@ namespace RareAPI.Services
         {
             // This could be a more complex business logic method
             var allPosts = await _databaseService.GetAllPostsAsync();
-            return allPosts.Where(p => p.IsPublished).ToList();
+            return allPosts.Where(p => p.Approved == true).ToList();
         }
     }
 }
