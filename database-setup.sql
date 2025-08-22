@@ -1,82 +1,59 @@
-CREATE TABLE IF NOT EXISTS "Users" (
-    "id" SERIAL PRIMARY KEY,
-    "first_name" varchar,
-    "last_name" varchar,
-    "email" varchar,
-    "bio" varchar,
-    "username" varchar,
-    "password" varchar,
-    "profile_image_url" varchar,
-    "created_on" date,
-    "active" bit
+CREATE TABLE IF NOT EXISTS Users (
+    Id SERIAL PRIMARY KEY,
+    FirstName VARCHAR(100) NOT NULL,
+    LastName VARCHAR(100) NOT NULL,
+    Email VARCHAR(255) UNIQUE NOT NULL,
+    Password VARCHAR(255) NOT NULL,
+    CreatedOn TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    IsActive BOOLEAN NOT NULL DEFAULT true
 );
-CREATE TABLE IF NOT EXISTS "DemotionQueue" (
-    "action" varchar,
-    "admin_id" INTEGER,
-    "approver_one_id" INTEGER,
-    FOREIGN KEY("admin_id") REFERENCES "Users"("id"),
-    FOREIGN KEY("approver_one_id") REFERENCES "Users"("id"),
-    PRIMARY KEY (action, admin_id, approver_one_id)
+-- Create Posts table for RareAPI
+CREATE TABLE IF NOT EXISTS Posts (
+    Id SERIAL PRIMARY KEY,
+    Title VARCHAR(255) NOT NULL,
+    Content TEXT NOT NULL,
+    UserId INTEGER NOT NULL REFERENCES Users(Id) ON DELETE CASCADE,
+    CreatedOn TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UpdatedOn TIMESTAMP NULL,
+    IsPublished BOOLEAN NOT NULL DEFAULT false
 );
-CREATE TABLE IF NOT EXISTS "Subscriptions" (
-    "id" SERIAL PRIMARY KEY,
-    "follower_id" INTEGER,
-    "author_id" INTEGER,
-    "created_on" date,
-    FOREIGN KEY("follower_id") REFERENCES "Users"("id"),
-    FOREIGN KEY("author_id") REFERENCES "Users"("id")
-);
-CREATE TABLE IF NOT EXISTS "Posts" (
-    "id" SERIAL PRIMARY KEY,
-    "user_id" INTEGER,
-    "category_id" INTEGER,
-    "title" varchar,
-    "publication_date" date,
-    "image_url" varchar,
-    "content" varchar,
-    "approved" bit,
-    FOREIGN KEY("user_id") REFERENCES "Users"("id")
-);
-CREATE TABLE IF NOT EXISTS "Comments" (
-    "id" SERIAL PRIMARY KEY,
-    "post_id" INTEGER,
-    "author_id" INTEGER,
-    "content" varchar,
-    FOREIGN KEY("post_id") REFERENCES "Posts"("id"),
-    FOREIGN KEY("author_id") REFERENCES "Users"("id")
-);
-CREATE TABLE IF NOT EXISTS "Reactions" (
-    "id" SERIAL PRIMARY KEY,
-    "label" varchar,
-    "image_url" varchar
-);
-CREATE TABLE IF NOT EXISTS "PostReactions" (
-    "id" SERIAL PRIMARY KEY,
-    "user_id" INTEGER,
-    "reaction_id" INTEGER,
-    "post_id" INTEGER,
-    FOREIGN KEY("user_id") REFERENCES "Users"("id"),
-    FOREIGN KEY("reaction_id") REFERENCES "Reactions"("id"),
-    FOREIGN KEY("post_id") REFERENCES "Posts"("id")
-);
-CREATE TABLE IF NOT EXISTS "Tags" (
-    "id" SERIAL PRIMARY KEY,
-    "label" varchar
-);
-CREATE TABLE IF NOT EXISTS "PostTags" (
-    "id" SERIAL PRIMARY KEY,
-    "post_id" INTEGER,
-    "tag_id" INTEGER,
-    FOREIGN KEY("post_id") REFERENCES "Posts"("id"),
-    FOREIGN KEY("tag_id") REFERENCES "Tags"("id")
-);
-CREATE TABLE IF NOT EXISTS "Categories" (
-    "id" SERIAL PRIMARY KEY,
-    "label" varchar
-);
-INSERT INTO "Categories" ("label")
-VALUES ('News');
-INSERT INTO "Tags" ("label")
-VALUES ('JavaScript');
-INSERT INTO "Reactions" ("label", "image_url")
-VALUES ('happy', 'https://pngtree.com/so/happy');
+-- Insert a test user (password is 'password123')
+INSERT INTO Users (
+        FirstName,
+        LastName,
+        Email,
+        Password,
+        CreatedOn,
+        IsActive
+    )
+VALUES (
+        'John',
+        'Doe',
+        'john.doe@example.com',
+        'password123',
+        CURRENT_TIMESTAMP,
+        true
+    );
+-- Insert some test posts
+INSERT INTO Posts (Title, Content, UserId, CreatedOn, IsPublished)
+VALUES (
+        'My First Post',
+        'This is the content of my first post. It''s quite exciting!',
+        1,
+        CURRENT_TIMESTAMP,
+        true
+    ),
+    (
+        'Draft Post',
+        'This is a draft post that hasn''t been published yet.',
+        1,
+        CURRENT_TIMESTAMP,
+        false
+    ),
+    (
+        'Another Published Post',
+        'Here''s another post with some interesting content.',
+        1,
+        CURRENT_TIMESTAMP,
+        true
+    );

@@ -5,7 +5,7 @@
             "server": "localhost",
             "port": 5432,
             "driver": "PostgreSQL",
-            "name": "DefaultConnection",
+            "name": "rare",
             "database": "raredb",
             "username": "postgres"
         }

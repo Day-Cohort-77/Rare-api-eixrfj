@@ -1,8 +1,8 @@
 using Npgsql;
-using Rare.Models;
+using RareAPI.Models;
 using System.Data;
 
-namespace Rare.Services
+namespace RareAPI.Services
 {
     public class DatabaseService
     {
@@ -11,10 +11,10 @@ namespace Rare.Services
         public DatabaseService(IConfiguration configuration)
         {
             _connectionString = configuration.GetConnectionString("DefaultConnection") ??
-                throw new InvalidOperationException("Connection string 'RareConnectionString' not found.");
+                throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
         }
 
-        public NpgsqlConnection CreateConnection()
+        private NpgsqlConnection CreateConnection()
         {
             return new NpgsqlConnection(_connectionString);
         }
@@ -40,237 +40,316 @@ namespace Rare.Services
         public async Task InitializeDatabaseAsync()
         {
             // First, create the database if it doesn't exist
-            // Use lowercase for database name to avoid case sensitivity issues
-            string dbName = "raredb";
-            using var connection = new NpgsqlConnection(_connectionString.Replace("Database=raredb", "Database=postgres").Replace("Database=raredb", "Database=postgres"));
+            using var connection = new NpgsqlConnection(_connectionString.Replace("Database=rare", "Database=postgres"));
             await connection.OpenAsync();
 
             // Check if database exists
             using var checkCommand = new NpgsqlCommand(
-                $"SELECT 1 FROM pg_database WHERE datname = '{dbName}'",
+                "SELECT 1 FROM pg_database WHERE datname = 'rare'",
                 connection);
             var exists = await checkCommand.ExecuteScalarAsync();
 
             if (exists == null)
             {
-                // Create the database using lowercase name
+                // Create the database
                 using var createDbCommand = new NpgsqlCommand(
-                    $"CREATE DATABASE {dbName}",
+                    "CREATE DATABASE rare",
                     connection);
                 await createDbCommand.ExecuteNonQueryAsync();
             }
 
-            // Now connect to the raredb database and create tables
+            // Now connect to the harbormaster database and create tables
             string sql = File.ReadAllText("database-setup.sql");
             await ExecuteNonQueryAsync(sql);
         }
-        public async Task SeedDatabaseAsync()
+
+        // User-related methods
+        public async Task<bool> UserExistsAsync(string email)
         {
             using var connection = CreateConnection();
             await connection.OpenAsync();
 
-            // Check if users table has data
-            using var command = new NpgsqlCommand("SELECT COUNT(*) FROM \"Users\"", connection);
-            var count = Convert.ToInt32(await command.ExecuteScalarAsync());
+            using var command = new NpgsqlCommand("SELECT COUNT(*) FROM Users WHERE Email = @email", connection);
+            command.Parameters.AddWithValue("@email", email);
 
-            if (count > 0)
-            {
-                return;
-            }
-
-            // Seed Users (let DB auto-generate id)
-                        await ExecuteNonQueryAsync(
-                                @"INSERT INTO ""Users"" (first_name, last_name, email, bio, username, password, profile_image_url, created_on, active)
-                                    VALUES (@firstName, @lastName, @email, @bio, @username, @password, @profileImageUrl, NOW(), @active)",
-                                new Dictionary<string, object>
-                                {
-                                        ["@firstName"] = "New",
-                                        ["@lastName"] = "User",
-                                        ["@email"] = "new_user@example.com",
-                                        ["@bio"] = "Seeded user bio",
-                                        ["@username"] = "new_user_name",
-                                        ["@password"] = "hashed_password_string",
-                                        ["@profileImageUrl"] = "some_url",
-                                        ["@active"] = true
-                                });
-
-            // Get inserted user id
-            int userId;
-            using (var cmd = new NpgsqlCommand("SELECT id FROM \"Users\" WHERE username = @username", connection))
-            {
-                cmd.Parameters.AddWithValue("@username", "new_user_name");
-                userId = (int)await cmd.ExecuteScalarAsync();
-            }
-
-            // Seed Posts
-                        await ExecuteNonQueryAsync(
-                                @"INSERT INTO ""Posts"" (user_id, title, publication_date, image_url, content, approved)
-                                    VALUES (@userId, @title, NOW(), @imageUrl, @content, @approved)",
-                                new Dictionary<string, object>
-                                {
-                                        ["@userId"] = userId,
-                                        ["@title"] = "new_title",
-                                        ["@imageUrl"] = "new_image_url",
-                                        ["@content"] = "Seeded post content",
-                                        ["@approved"] = true
-                                });
-
-            // Get inserted post id
-            int postId;
-            using (var cmd = new NpgsqlCommand("SELECT id FROM \"Posts\" WHERE title = @title", connection))
-            {
-                cmd.Parameters.AddWithValue("@title", "new_title");
-                postId = (int)await cmd.ExecuteScalarAsync();
-            }
-
-            // Seed Comments
-                        await ExecuteNonQueryAsync(
-                                @"INSERT INTO ""Comments"" (post_id, author_id, content)
-                                    VALUES (@postId, @authorId, @content)",
-                                new Dictionary<string, object>
-                                {
-                                        ["@postId"] = postId,
-                                        ["@authorId"] = userId,
-                                        ["@content"] = "This is a seeded comment."
-                                });
-            await ExecuteNonQueryAsync(@"
-                INSERT INTO users (id, username, email, password, created) 
-                VALUES (@id, @username, @email, @password, NOW())",
-                new Dictionary<string, object>
-                {
-                    ["@id"] = userId,
-                    ["@username"] = "new_user_name",
-                    ["@email"] = "new_user@example.com",
-                    ["@password"] = "hashed_password_string"
-                });
-
-            // Seed Posts
-            var posts = Guid.NewGuid().ToString();
-            await ExecuteNonQueryAsync(@"
-                INSERT INTO posts (id, userId, title, imageUrl, publicationDate) 
-                VALUES (@id, @userId, @title, @imageUrl, NOW())",
-                new Dictionary<string, object>
-                {
-                    ["@id"] = postId,
-                    ["@userId"] = userId,
-                    ["@title"] = "new_title",
-                    ["@imageUrl"] = "new_image_url"
-                });
-
-            // Seed Comments
-            var comments = Guid.NewGuid().ToString();
-            await ExecuteNonQueryAsync(@"
-                INSERT INTO comments (id, author_id, post_id, content, created) 
-                VALUES (@id, @authorId, @postId, @content, NOW())",
-                new Dictionary<string, object>
-                {
-                    ["@id"] = comments,
-                    ["@authorId"] = userId,
-                    ["@postId"] = postId,
-                    ["@content"] = "This is a seeded comment."
-                });
+            var result = await command.ExecuteScalarAsync();
+            return result != null && (long)result > 0;
         }
 
-        // Get all users
-        public async Task<List<Users>> GetAllUsersAsync()
+        public async Task<User?> CreateUserAsync(User newUser)
         {
-            var users = new List<Users>();
+            using var connection = CreateConnection();
+            await connection.OpenAsync();
+
+            var insertSql = @"
+                INSERT INTO Users (FirstName, LastName, Email, Password, CreatedOn, IsActive)
+                VALUES (@firstName, @lastName, @email, @password, @createdOn, @isActive)
+                RETURNING Id, FirstName, LastName, Email, CreatedOn, IsActive";
+
+            using var command = new NpgsqlCommand(insertSql, connection);
+            command.Parameters.AddWithValue("@firstName", newUser.FirstName);
+            command.Parameters.AddWithValue("@lastName", newUser.LastName);
+            command.Parameters.AddWithValue("@email", newUser.Email);
+            command.Parameters.AddWithValue("@password", newUser.Password);
+            command.Parameters.AddWithValue("@createdOn", DateTime.UtcNow);
+            command.Parameters.AddWithValue("@isActive", true);
+
+            using var reader = await command.ExecuteReaderAsync();
+            if (await reader.ReadAsync())
+            {
+                return new User
+                {
+                    Id = reader.GetInt32(0),
+                    FirstName = reader.GetString(1),
+                    LastName = reader.GetString(2),
+                    Email = reader.GetString(3),
+                    CreatedOn = reader.GetDateTime(4),
+                    IsActive = reader.GetBoolean(5)
+                    // Don't return password
+                };
+            }
+
+            return null;
+        }
+
+        public async Task<(int? userId, string? password)> GetUserCredentialsAsync(string email)
+        {
+            using var connection = CreateConnection();
+            await connection.OpenAsync();
+
+            var sql = "SELECT Id, Password FROM Users WHERE Email = @email AND IsActive = true";
+            using var command = new NpgsqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@email", email);
+
+            using var reader = await command.ExecuteReaderAsync();
+            if (await reader.ReadAsync())
+            {
+                return (reader.GetInt32(0), reader.GetString(1));
+            }
+
+            return (null, null);
+        }
+
+        public async Task<User?> GetUserByIdAsync(int id)
+        {
+            using var connection = CreateConnection();
+            await connection.OpenAsync();
+
+            var sql = "SELECT Id, FirstName, LastName, Email, CreatedOn, IsActive FROM Users WHERE Id = @id";
+            using var command = new NpgsqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@id", id);
+
+            using var reader = await command.ExecuteReaderAsync();
+            if (await reader.ReadAsync())
+            {
+                return new User
+                {
+                    Id = reader.GetInt32(0),
+                    FirstName = reader.GetString(1),
+                    LastName = reader.GetString(2),
+                    Email = reader.GetString(3),
+                    CreatedOn = reader.GetDateTime(4),
+                    IsActive = reader.GetBoolean(5)
+                    // Don't return password
+                };
+            }
+
+            return null;
+        }
+
+        public async Task<List<User>> GetAllUsersAsync()
+        {
+            var users = new List<User>();
 
             using var connection = CreateConnection();
             await connection.OpenAsync();
 
-            using var command = new NpgsqlCommand("SELECT id, username, password, email FROM users", connection);
+            using var command = new NpgsqlCommand("SELECT Id, FirstName, LastName, Email, CreatedOn, IsActive FROM Users WHERE IsActive = true", connection);
             using var reader = await command.ExecuteReaderAsync();
 
             while (await reader.ReadAsync())
             {
-                users.Add(new Users
+                users.Add(new User
                 {
                     Id = reader.GetInt32(0),
-                    Username = reader.GetString(1),
-                    Password = reader.GetString(2),
-                    Email = reader.GetString(3)
+                    FirstName = reader.GetString(1),
+                    LastName = reader.GetString(2),
+                    Email = reader.GetString(3),
+                    CreatedOn = reader.GetDateTime(4),
+                    IsActive = reader.GetBoolean(5)
+                    // Don't return password
                 });
             }
+
             return users;
         }
 
-        // Get users by ID
-        public async Task<Users?> GetUsersByIdAsync(int id)
+        // Post-related methods
+        public async Task<List<Post>> GetAllPostsAsync()
         {
-            using var connection = CreateConnection();
-            await connection.OpenAsync();
-
-            using var command = new NpgsqlCommand(
-                "SELECT id, username, password, email FROM users WHERE id = @id",
-                connection);
-            command.Parameters.AddWithValue("@id", id);
-
-            using var reader = await command.ExecuteReaderAsync();
-
-            if (await reader.ReadAsync())
-            {
-                return new Users
-                {
-                    Id = reader.GetInt32(0),
-                    Username = reader.GetString(1),
-                    Password = reader.GetString(2),
-                    Email = reader.GetString(3)
-                };
-            }
-
-            return null;
-        }
-
-        // Get all Posts
-        public async Task<List<Posts>> GetAllPostsAsync()
-        {
-            var posts = new List<Posts>();
+            var posts = new List<Post>();
 
             using var connection = CreateConnection();
             await connection.OpenAsync();
 
-            using var command = new NpgsqlCommand("SELECT id, userId, title, imageUrl FROM posts", connection);
+            using var command = new NpgsqlCommand("SELECT Id, Title, Content, UserId, CreatedOn, UpdatedOn, IsPublished FROM Posts ORDER BY CreatedOn DESC", connection);
             using var reader = await command.ExecuteReaderAsync();
 
             while (await reader.ReadAsync())
             {
-                posts.Add(new Posts
+                posts.Add(new Post
                 {
                     Id = reader.GetInt32(0),
-                    UserId = reader.GetInt32(1),
-                    Title = reader.GetString(2),
-                    ImageUrl = reader.GetString(3)
+                    Title = reader.GetString(1),
+                    Content = reader.GetString(2),
+                    UserId = reader.GetInt32(3),
+                    CreatedOn = reader.GetDateTime(4),
+                    UpdatedOn = reader.IsDBNull(5) ? null : reader.GetDateTime(5),
+                    IsPublished = reader.GetBoolean(6)
                 });
             }
+
             return posts;
         }
 
-        // Get Posts by id
-        public async Task<Posts?> GetPostsByIdAsync(int id)
+        public async Task<Post?> GetPostByIdAsync(int id)
         {
             using var connection = CreateConnection();
             await connection.OpenAsync();
 
-            using var command = new NpgsqlCommand(
-                "SELECT id, userId, title, imageUrl FROM posts WHERE id = @id",
-                connection);
+            var sql = "SELECT Id, Title, Content, UserId, CreatedOn, UpdatedOn, IsPublished FROM Posts WHERE Id = @id";
+            using var command = new NpgsqlCommand(sql, connection);
             command.Parameters.AddWithValue("@id", id);
 
             using var reader = await command.ExecuteReaderAsync();
-
             if (await reader.ReadAsync())
             {
-                return new Posts
+                return new Post
                 {
                     Id = reader.GetInt32(0),
-                    UserId = reader.GetInt32(1),
-                    Title = reader.GetString(2),
-                    ImageUrl = reader.GetString(3)
+                    Title = reader.GetString(1),
+                    Content = reader.GetString(2),
+                    UserId = reader.GetInt32(3),
+                    CreatedOn = reader.GetDateTime(4),
+                    UpdatedOn = reader.IsDBNull(5) ? null : reader.GetDateTime(5),
+                    IsPublished = reader.GetBoolean(6)
                 };
             }
 
             return null;
+        }
+
+        public async Task<Post?> CreatePostAsync(Post newPost)
+        {
+            using var connection = CreateConnection();
+            await connection.OpenAsync();
+
+            var insertSql = @"
+                INSERT INTO Posts (Title, Content, UserId, CreatedOn, IsPublished)
+                VALUES (@title, @content, @userId, @createdOn, @isPublished)
+                RETURNING Id, Title, Content, UserId, CreatedOn, UpdatedOn, IsPublished";
+
+            using var command = new NpgsqlCommand(insertSql, connection);
+            command.Parameters.AddWithValue("@title", newPost.Title);
+            command.Parameters.AddWithValue("@content", newPost.Content);
+            command.Parameters.AddWithValue("@userId", newPost.UserId);
+            command.Parameters.AddWithValue("@createdOn", DateTime.UtcNow);
+            command.Parameters.AddWithValue("@isPublished", newPost.IsPublished);
+
+            using var reader = await command.ExecuteReaderAsync();
+            if (await reader.ReadAsync())
+            {
+                return new Post
+                {
+                    Id = reader.GetInt32(0),
+                    Title = reader.GetString(1),
+                    Content = reader.GetString(2),
+                    UserId = reader.GetInt32(3),
+                    CreatedOn = reader.GetDateTime(4),
+                    UpdatedOn = reader.IsDBNull(5) ? null : reader.GetDateTime(5),
+                    IsPublished = reader.GetBoolean(6)
+                };
+            }
+
+            return null;
+        }
+
+        public async Task<Post?> UpdatePostAsync(int id, Post updatedPost)
+        {
+            using var connection = CreateConnection();
+            await connection.OpenAsync();
+
+            var updateSql = @"
+                UPDATE Posts
+                SET Title = @title, Content = @content, UpdatedOn = @updatedOn, IsPublished = @isPublished
+                WHERE Id = @id
+                RETURNING Id, Title, Content, UserId, CreatedOn, UpdatedOn, IsPublished";
+
+            using var command = new NpgsqlCommand(updateSql, connection);
+            command.Parameters.AddWithValue("@id", id);
+            command.Parameters.AddWithValue("@title", updatedPost.Title);
+            command.Parameters.AddWithValue("@content", updatedPost.Content);
+            command.Parameters.AddWithValue("@updatedOn", DateTime.UtcNow);
+            command.Parameters.AddWithValue("@isPublished", updatedPost.IsPublished);
+
+            using var reader = await command.ExecuteReaderAsync();
+            if (await reader.ReadAsync())
+            {
+                return new Post
+                {
+                    Id = reader.GetInt32(0),
+                    Title = reader.GetString(1),
+                    Content = reader.GetString(2),
+                    UserId = reader.GetInt32(3),
+                    CreatedOn = reader.GetDateTime(4),
+                    UpdatedOn = reader.IsDBNull(5) ? null : reader.GetDateTime(5),
+                    IsPublished = reader.GetBoolean(6)
+                };
+            }
+
+            return null;
+        }
+
+        public async Task<bool> DeletePostAsync(int id)
+        {
+            using var connection = CreateConnection();
+            await connection.OpenAsync();
+
+            var deleteSql = "DELETE FROM Posts WHERE Id = @id";
+            using var command = new NpgsqlCommand(deleteSql, connection);
+            command.Parameters.AddWithValue("@id", id);
+
+            var rowsAffected = await command.ExecuteNonQueryAsync();
+            return rowsAffected > 0;
+        }
+
+        public async Task<List<Post>> GetPostsByUserIdAsync(int userId)
+        {
+            var posts = new List<Post>();
+
+            using var connection = CreateConnection();
+            await connection.OpenAsync();
+
+            var sql = "SELECT Id, Title, Content, UserId, CreatedOn, UpdatedOn, IsPublished FROM Posts WHERE UserId = @userId ORDER BY CreatedOn DESC";
+            using var command = new NpgsqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@userId", userId);
+
+            using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                posts.Add(new Post
+                {
+                    Id = reader.GetInt32(0),
+                    Title = reader.GetString(1),
+                    Content = reader.GetString(2),
+                    UserId = reader.GetInt32(3),
+                    CreatedOn = reader.GetDateTime(4),
+                    UpdatedOn = reader.IsDBNull(5) ? null : reader.GetDateTime(5),
+                    IsPublished = reader.GetBoolean(6)
+                });
+            }
+
+            return posts;
         }
     }
 }

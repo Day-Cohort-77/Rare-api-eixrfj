@@ -1,1 +1,11 @@
-{"Version":1,"Hash":"pqhTZsH60udQ0TFQB3dwqn/BcxA77ft7Ko03+pLa+Ms=","Source":"Rare-api-eixrfj","BasePath":"_content/Rare-api-eixrfj","Mode":"Default","ManifestType":"Build","ReferencedProjectsConfiguration":[],"DiscoveryPatterns":[],"Assets":[],"Endpoints":[]}
+{
+  "Version": 1,
+  "Hash": "MNF6fvdFbLx/Rg+LSmmS/G6GtmT4cTFG4YCAxUeJi0Y=",
+  "Source": "RareAPI",
+  "BasePath": "_content/RareAPI",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

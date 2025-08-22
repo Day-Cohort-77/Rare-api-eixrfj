@@ -2,7 +2,7 @@
   "version": 3,
   "targets": {
     "net8.0": {
-      "Microsoft.AspNetCore.OpenApi/8.0.18": {
+      "Microsoft.AspNetCore.OpenApi/8.0.15": {
         "type": "package",
         "dependencies": {
           "Microsoft.OpenApi": "1.4.3"
@@ -162,10 +162,10 @@
     }
   },
   "libraries": {
-    "Microsoft.AspNetCore.OpenApi/8.0.18": {
-      "sha512": "iHqDbyK66dTL2M32nQ/kqYXGbQFj5bUr0eXJskJMsuPCF4CfJbJCuSnwWKq0m2TrMGuNV01RJLU61S2uvS04+g==",
+    "Microsoft.AspNetCore.OpenApi/8.0.15": {
+      "sha512": "Nu/I5tek+FbumgyrfNAxcPZd8uQi6VTYfZ+6Wr/JYrHFM6zb6DJx99v5QjMnsf9ePHkUto0zvUFVaA2gpiV9mQ==",
       "type": "package",
-      "path": "microsoft.aspnetcore.openapi/8.0.18",
+      "path": "microsoft.aspnetcore.openapi/8.0.15",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -173,7 +173,7 @@
         "THIRD-PARTY-NOTICES.TXT",
         "lib/net8.0/Microsoft.AspNetCore.OpenApi.dll",
         "lib/net8.0/Microsoft.AspNetCore.OpenApi.xml",
-        "microsoft.aspnetcore.openapi.8.0.18.nupkg.sha512",
+        "microsoft.aspnetcore.openapi.8.0.15.nupkg.sha512",
         "microsoft.aspnetcore.openapi.nuspec"
       ]
     },
@@ -650,37 +650,30 @@
   },
   "projectFileDependencyGroups": {
     "net8.0": [
-      "Microsoft.AspNetCore.OpenApi >= 8.0.18",
+      "Microsoft.AspNetCore.OpenApi >= 8.0.15",
       "Npgsql >= 9.0.3",
       "Swashbuckle.AspNetCore >= 6.6.2"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\dylan\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\mphil\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\dylan\\workspace\\Rare-api-eixrfj\\Rare-api-eixrfj.csproj",
-      "projectName": "Rare-api-eixrfj",
-      "projectPath": "C:\\Users\\dylan\\workspace\\Rare-api-eixrfj\\Rare-api-eixrfj.csproj",
-      "packagesPath": "C:\\Users\\dylan\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\dylan\\workspace\\Rare-api-eixrfj\\obj\\",
+      "projectUniqueName": "C:\\Users\\mphil\\workspace\\csharp\\Rare-api-eixrfj\\RareAPI.csproj",
+      "projectName": "RareAPI",
+      "projectPath": "C:\\Users\\mphil\\workspace\\csharp\\Rare-api-eixrfj\\RareAPI.csproj",
+      "packagesPath": "C:\\Users\\mphil\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\mphil\\workspace\\csharp\\Rare-api-eixrfj\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-      ],
       "configFilePaths": [
-        "C:\\Users\\dylan\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "C:\\Users\\mphil\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -698,8 +691,7 @@
         "enableAudit": "true",
         "auditLevel": "low",
         "auditMode": "direct"
-      },
-      "SdkAnalysisLevel": "9.0.300"
+      }
     },
     "frameworks": {
       "net8.0": {
@@ -707,7 +699,7 @@
         "dependencies": {
           "Microsoft.AspNetCore.OpenApi": {
             "target": "Package",
-            "version": "[8.0.18, )"
+            "version": "[8.0.15, )"
           },
           "Npgsql": {
             "target": "Package",
@@ -737,7 +729,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.412/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

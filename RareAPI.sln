@@ -2,7 +2,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rare-api-eixfj", "Rare-api-eixfj.csproj", "{40FFDEDB-FC73-1148-D0F1-F0AFF3B9D274}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RareAPI", "RareAPI.csproj", "{D05A8334-65B1-AA3E-0FC0-C3F70A46CD43}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -10,15 +10,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{40FFDEDB-FC73-1148-D0F1-F0AFF3B9D274}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{40FFDEDB-FC73-1148-D0F1-F0AFF3B9D274}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{40FFDEDB-FC73-1148-D0F1-F0AFF3B9D274}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{40FFDEDB-FC73-1148-D0F1-F0AFF3B9D274}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D05A8334-65B1-AA3E-0FC0-C3F70A46CD43}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D05A8334-65B1-AA3E-0FC0-C3F70A46CD43}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D05A8334-65B1-AA3E-0FC0-C3F70A46CD43}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D05A8334-65B1-AA3E-0FC0-C3F70A46CD43}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {CAF86C7D-2D9C-46B7-947B-EC508AAA2803}
+		SolutionGuid = {9676DCBE-CA97-45F9-B50E-6555E99C1105}
 	EndGlobalSection
 EndGlobal

@@ -1,39 +1,35 @@
-// var builder = WebApplication.CreateBuilder(args);
-
-// // Add services to the container.
-// // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-// builder.Services.AddEndpointsApiExplorer();
-// builder.Services.AddSwaggerGen();
-
-// var app = builder.Build();
-
-// // Configure the HTTP request pipeline.
-// if (app.Environment.IsDevelopment())
-// {
-//     app.UseSwagger();
-//     app.UseSwaggerUI();
-// }
-
-// app.UseHttpsRedirection();
-
-
-using Rare.Services;
+using RareAPI.Endpoints;
+using RareAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+// Add CORS policy to allow frontend on localhost:3000
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        policy => policy.WithOrigins("http://localhost:3000")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod());
+});
 
+// Add services to the DI container.
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSingleton<DatabaseService>();
+builder.Services.AddSingleton<PostService>();
 
 var app = builder.Build();
 
-// Initialize the database
+// Use CORS policy
+app.UseCors("AllowFrontend");
+
 using (var scope = app.Services.CreateScope())
 {
     var dbService = scope.ServiceProvider.GetRequiredService<DatabaseService>();
     await dbService.InitializeDatabaseAsync();
 }
 
-// Define API endpoints
-app.MapGet("/", () => "Welcome to Rare API!");
+app.MapGet("/", () => "Welcome to Rare Publishing Platform API!");
+
+app.MapAuthEndpoints();
+app.MapPostEndpoints();
 
 app.Run();
