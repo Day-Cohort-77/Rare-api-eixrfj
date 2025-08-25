@@ -51,5 +51,5 @@ app.MapGet("/", () => "Welcome to Rare Publishing Platform API!");
 
 app.MapAuthEndpoints();
 app.MapPostEndpoints();
-
+app.MapCategoryEndpoints();
 app.Run();
