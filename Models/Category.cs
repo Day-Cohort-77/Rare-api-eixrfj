@@ -1,0 +1,9 @@
+namespace RareAPI.Models
+{
+    public class Category
+    {
+        public int Id { get; set; }
+        public string Label { get; set; } = string.Empty;
+
+    }
+}

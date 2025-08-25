@@ -25,6 +25,17 @@ CREATE TABLE IF NOT EXISTS Posts (
     content VARCHAR(1000) NOT NULL,
     approved BOOLEAN
 );
+DROP TABLE IF EXISTS Categories CASCADE;
+-- Create Posts table for RareAPI
+CREATE TABLE IF NOT EXISTS Categories (
+    id SERIAL PRIMARY KEY,
+    label VARCHAR(255) NOT NULL
+);
+INSERT INTO Categories (Label)
+VALUES ('Fiction'),
+    ('Poetry'),
+    ('Drama'),
+    ('Nonfiction') ON CONFLICT DO NOTHING;
 -- Insert a test user (password is 'password123')
 INSERT INTO Users (
         first_name,

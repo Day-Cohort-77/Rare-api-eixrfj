@@ -656,19 +656,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\mphil\\.nuget\\packages\\": {}
+    "C:\\Users\\ksimo\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\mphil\\workspace\\csharp\\Rare-api-eixrfj\\RareAPI.csproj",
+      "projectUniqueName": "C:\\Users\\ksimo\\workspace\\csharp\\rare\\Rare-api-eixrfj\\RareAPI.csproj",
       "projectName": "RareAPI",
-      "projectPath": "C:\\Users\\mphil\\workspace\\csharp\\Rare-api-eixrfj\\RareAPI.csproj",
-      "packagesPath": "C:\\Users\\mphil\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\mphil\\workspace\\csharp\\Rare-api-eixrfj\\obj\\",
+      "projectPath": "C:\\Users\\ksimo\\workspace\\csharp\\rare\\Rare-api-eixrfj\\RareAPI.csproj",
+      "packagesPath": "C:\\Users\\ksimo\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\ksimo\\workspace\\csharp\\rare\\Rare-api-eixrfj\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\mphil\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\ksimo\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"

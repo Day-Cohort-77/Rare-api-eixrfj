@@ -357,5 +357,30 @@ namespace RareAPI.Services
 
             return posts;
         }
+
+        public async Task<List<Category>> GetAllCategoriesAsync()
+        {
+            var Categories = new List<Category>();
+
+            using var connection = CreateConnection();
+            await connection.OpenAsync();
+
+            using var command = new NpgsqlCommand("SELECT id, Label FROM Categories ORDER BY Label ASC", connection);
+            using var reader = await command.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                Categories.Add(new Category
+                {
+                    Id = reader.GetInt32(0),
+                    Label = reader.GetString(1),
+                });
+            }
+
+            return Categories;
+        }
     }
+
 }
+
+
