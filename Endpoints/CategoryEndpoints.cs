@@ -29,43 +29,42 @@ namespace RareAPI.Endpoints
             // });
 
             // POST /posts
-            // endpoints.MapPost("/posts", async (Post postRequest, DatabaseService databaseService) =>
-            // {
-            //     try
-            //     {
-            //         var newPost = new Post
-            //         {
-            //             Title = postRequest.Title,
-            //             Content = postRequest.Content,
-            //             UserId = postRequest.UserId,
-            //             IsPublished = postRequest.IsPublished
-            //         };
-
-            //     }
-            //     catch (Exception ex)
-            //     {
-            //         return Results.Problem($"An error occurred: {ex.Message}");
-            //     }
-            // });
-
-            // DELETE /posts/{id}
-            endpoints.MapDelete("/posts/{id:int}", async (int id, DatabaseService databaseService) =>
+            endpoints.MapPost("/Categories", async (Category postRequest, DatabaseService databaseService) =>
             {
                 try
                 {
-                    var deleted = await databaseService.DeletePostAsync(id);
-                    if (deleted)
+                    var newCategory = new Category
                     {
-                        return Results.NoContent();
-                    }
+                        Label = postRequest.Label,
+                    };
+                    var createdCategory = await databaseService.CreateCategoryAsync(newCategory);
+                    return Results.Created($"/Categories/{createdCategory?.Id}", createdCategory);
 
-                    return Results.NotFound(new { message = "Post not found" });
                 }
                 catch (Exception ex)
                 {
                     return Results.Problem($"An error occurred: {ex.Message}");
                 }
             });
+
+            // DELETE /posts/{id}
+            // endpoints.MapDelete("/posts/{id:int}", async (int id, DatabaseService databaseService) =>
+            // {
+            //     try
+            //     {
+            //         var deleted = await databaseService.DeletePostAsync(id);
+            //         if (deleted)
+            //         {
+            //             return Results.NoContent();
+            //         }
+
+            //         return Results.NotFound(new { message = "Post not found" });
+            //     }
+            //     catch (Exception ex)
+            //     {
+            //         return Results.Problem($"An error occurred: {ex.Message}");
+            //     }
+            // });
 
             // GET /users/{userId}/posts
             // endpoints.MapGet("/users/{userId:int}/posts", async (int userId, DatabaseService databaseService) =>

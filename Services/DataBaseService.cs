@@ -379,6 +379,33 @@ namespace RareAPI.Services
 
             return Categories;
         }
+        public async Task<Category?> CreateCategoryAsync(Category newCategory)
+        {
+            using var connection = CreateConnection();
+            await connection.OpenAsync();
+
+            var insertSql = @"
+                INSERT INTO Users (label)
+                VALUES (@label)
+                RETURNING id, label";
+
+            using var command = new NpgsqlCommand(insertSql, connection);
+            command.Parameters.AddWithValue("@label", newCategory.Label);
+
+
+            using var reader = await command.ExecuteReaderAsync();
+            if (await reader.ReadAsync())
+            {
+                return new Category
+                {
+                    Id = reader.GetInt32(0),
+                    Label = reader.GetString(1),
+
+                };
+            }
+
+            return null;
+        }
     }
 
 }
