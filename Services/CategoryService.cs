@@ -17,10 +17,6 @@ namespace RareAPI.Services
             return await _databaseService.GetAllCategoriesAsync();
         }
 
-        // public async Task<Post?> GetPostByIdAsync(int id)
-        // {
-        //     return await _databaseService.GetPostByIdAsync(id);
-        // }
 
         public async Task<Category?> CreateCategoryAsync(Category newCategory)
         {
@@ -51,10 +47,10 @@ namespace RareAPI.Services
         //     return await _databaseService.UpdatePostAsync(id, updatedPost);
         // }
 
-        // public async Task<bool> DeletePostAsync(int id)
-        // {
-        //     return await _databaseService.DeletePostAsync(id);
-        // }
+        public async Task<bool> DeleteCategoryAsync(int id)
+        {
+            return await _databaseService.DeleteCategoryAsync(id);
+        }
 
         // public async Task<List<Post>> GetPostsByUserIdAsync(int userId)
         // {
