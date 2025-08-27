@@ -39,12 +39,21 @@ namespace RareAPI.Services
 
         public async Task InitializeDatabaseAsync()
         {
-            // Run table creation and seeding on the configured database
+            // Only run setup SQL if the Users table does not exist
             using var connection = CreateConnection();
             await connection.OpenAsync();
 
-            string sql = File.ReadAllText("database-setup.sql");
-            await ExecuteNonQueryAsync(sql);
+            var checkTableCmd = new NpgsqlCommand(
+                "SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'users');",
+                connection);
+            var result = await checkTableCmd.ExecuteScalarAsync();
+            bool exists = result is bool b && b;
+
+            if (!exists)
+            {
+                string sql = File.ReadAllText("database-setup.sql");
+                await ExecuteNonQueryAsync(sql);
+            }
         }
 
         // User-related methods
