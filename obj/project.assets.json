@@ -656,19 +656,19 @@
     ]
   },
   "packageFolders": {
-    "/Users/bigdonnysdonuts/.nuget/packages/": {}
+    "C:\\Users\\ksimo\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/bigdonnysdonuts/workspace/csharp/rare/Rare-api-eixrfj/RareAPI.csproj",
+      "projectUniqueName": "C:\\Users\\ksimo\\workspace\\csharp\\rare\\Rare-api-eixrfj\\RareAPI.csproj",
       "projectName": "RareAPI",
-      "projectPath": "/Users/bigdonnysdonuts/workspace/csharp/rare/Rare-api-eixrfj/RareAPI.csproj",
-      "packagesPath": "/Users/bigdonnysdonuts/.nuget/packages/",
-      "outputPath": "/Users/bigdonnysdonuts/workspace/csharp/rare/Rare-api-eixrfj/obj/",
+      "projectPath": "C:\\Users\\ksimo\\workspace\\csharp\\rare\\Rare-api-eixrfj\\RareAPI.csproj",
+      "packagesPath": "C:\\Users\\ksimo\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\ksimo\\workspace\\csharp\\rare\\Rare-api-eixrfj\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/Users/bigdonnysdonuts/.nuget/NuGet/NuGet.Config"
+        "C:\\Users\\ksimo\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
@@ -729,7 +729,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.412/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.412/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

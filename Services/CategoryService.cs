@@ -11,16 +11,16 @@ namespace RareAPI.Services
             _databaseService = databaseService;
         }
 
-        // Business logic methods that use DatabaseService
+        //get all categories
         public async Task<List<Category>> GetAllCategoriesAsync()
         {
             return await _databaseService.GetAllCategoriesAsync();
         }
 
-
+        //create new category
         public async Task<Category?> CreateCategoryAsync(Category newCategory)
         {
-            // Add any business logic validation here
+
             if (string.IsNullOrWhiteSpace(newCategory.Label))
             {
                 throw new ArgumentException("Category Label cannot be empty");
@@ -31,8 +31,7 @@ namespace RareAPI.Services
             return await _databaseService.CreateCategoryAsync(newCategory);
         }
 
-
-
+        //delete category
         public async Task<bool> DeleteCategoryAsync(int id)
         {
             return await _databaseService.DeleteCategoryAsync(id);

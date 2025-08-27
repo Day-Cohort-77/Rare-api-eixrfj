@@ -39,7 +39,7 @@ namespace RareAPI.Endpoints
                 }
             });
 
-            // DELETE /posts/{id}
+            // DELETE /Categories/{id}
             endpoints.MapDelete("/Categories/{id:int}", async (int id, DatabaseService databaseService) =>
             {
                 try
