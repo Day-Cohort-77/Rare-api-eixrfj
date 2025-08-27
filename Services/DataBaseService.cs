@@ -385,7 +385,7 @@ namespace RareAPI.Services
             await connection.OpenAsync();
 
             var insertSql = @"
-                INSERT INTO Users (label)
+                INSERT INTO Categories (label)
                 VALUES (@label)
                 RETURNING id, label";
 
@@ -406,6 +406,41 @@ namespace RareAPI.Services
 
             return null;
         }
+
+        public async Task<bool> DeleteCategoryAsync(int id)
+        {
+            using var connection = CreateConnection();
+            await connection.OpenAsync();
+
+            var deleteSql = "DELETE FROM Categories WHERE id = @id";
+            using var command = new NpgsqlCommand(deleteSql, connection);
+            command.Parameters.AddWithValue("@id", id);
+
+            var rowsAffected = await command.ExecuteNonQueryAsync();
+            return rowsAffected > 0;
+        }
+
+        // public async Task<Post?> GetCategoryByIdAsync(int id)
+        // {
+        //     using var connection = CreateConnection();
+        //     await connection.OpenAsync();
+
+        //     var sql = "SELECT id, label FROM Categories WHERE id = @id";
+        //     using var command = new NpgsqlCommand(sql, connection);
+        //     command.Parameters.AddWithValue("@id", id);
+
+        //     using var reader = await command.ExecuteReaderAsync();
+        //     if (await reader.ReadAsync())
+        //     {
+        //         return new Post
+        //         {
+        //             Id = reader.GetInt32(0),
+
+        //         };
+        //     }
+
+        //     return null;
+        // }
     }
 
 }

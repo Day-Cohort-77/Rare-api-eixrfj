@@ -17,26 +17,19 @@ namespace RareAPI.Services
             return await _databaseService.GetAllCategoriesAsync();
         }
 
-        // public async Task<Post?> GetPostByIdAsync(int id)
-        // {
-        //     return await _databaseService.GetPostByIdAsync(id);
-        // }
 
-        // public async Task<Post?> CreatePostAsync(Post newPost)
-        // {
-        //     // Add any business logic validation here
-        //     if (string.IsNullOrWhiteSpace(newPost.Title))
-        //     {
-        //         throw new ArgumentException("Post title cannot be empty");
-        //     }
+        public async Task<Category?> CreateCategoryAsync(Category newCategory)
+        {
+            // Add any business logic validation here
+            if (string.IsNullOrWhiteSpace(newCategory.Label))
+            {
+                throw new ArgumentException("Category Label cannot be empty");
+            }
 
-        //     if (string.IsNullOrWhiteSpace(newPost.Content))
-        //     {
-        //         throw new ArgumentException("Post content cannot be empty");
-        //     }
 
-        //     return await _databaseService.CreatePostAsync(newPost);
-        // }
+
+            return await _databaseService.CreateCategoryAsync(newCategory);
+        }
 
         // public async Task<Post?> UpdatePostAsync(int id, Post updatedPost)
         // {
@@ -54,10 +47,10 @@ namespace RareAPI.Services
         //     return await _databaseService.UpdatePostAsync(id, updatedPost);
         // }
 
-        // public async Task<bool> DeletePostAsync(int id)
-        // {
-        //     return await _databaseService.DeletePostAsync(id);
-        // }
+        public async Task<bool> DeleteCategoryAsync(int id)
+        {
+            return await _databaseService.DeleteCategoryAsync(id);
+        }
 
         // public async Task<List<Post>> GetPostsByUserIdAsync(int userId)
         // {
