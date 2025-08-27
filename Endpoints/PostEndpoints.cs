@@ -21,31 +21,28 @@ namespace RareAPI.Endpoints
                 }
             });
 
-            // GET /posts/{id}
-            // endpoints.MapGet("/posts/{id:int}", async (int id, DatabaseService databaseService) =>
-            // {
-
-            // });
-
             // POST /posts
-            // endpoints.MapPost("/posts", async (Post postRequest, DatabaseService databaseService) =>
-            // {
-            //     try
-            //     {
-            //         var newPost = new Post
-            //         {
-            //             Title = postRequest.Title,
-            //             Content = postRequest.Content,
-            //             UserId = postRequest.UserId,
-            //             IsPublished = postRequest.IsPublished
-            //         };
-
-            //     }
-            //     catch (Exception ex)
-            //     {
-            //         return Results.Problem($"An error occurred: {ex.Message}");
-            //     }
-            // });
+            endpoints.MapPost("/posts", async (Post postRequest, PostService postService) =>
+            {
+                try
+                {
+                    // Validate and create post
+                    var createdPost = await postService.CreatePostAsync(postRequest);
+                    if (createdPost == null)
+                    {
+                        return Results.Problem("Failed to create post.");
+                    }
+                    return Results.Created($"/posts/{createdPost.Id}", createdPost);
+                }
+                catch (ArgumentException ex)
+                {
+                    return Results.BadRequest(new { message = ex.Message });
+                }
+                catch (Exception ex)
+                {
+                    return Results.Problem($"An error occurred: {ex.Message}");
+                }
+            });
 
             // DELETE /posts/{id}
             endpoints.MapDelete("/posts/{id:int}", async (int id, DatabaseService databaseService) =>
@@ -65,12 +62,6 @@ namespace RareAPI.Endpoints
                     return Results.Problem($"An error occurred: {ex.Message}");
                 }
             });
-
-            // GET /users/{userId}/posts
-            // endpoints.MapGet("/users/{userId:int}/posts", async (int userId, DatabaseService databaseService) =>
-            // {
-
-            // });
         }
     }
 }
