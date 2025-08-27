@@ -420,27 +420,34 @@ namespace RareAPI.Services
             return rowsAffected > 0;
         }
 
-        // public async Task<Post?> GetCategoryByIdAsync(int id)
-        // {
-        //     using var connection = CreateConnection();
-        //     await connection.OpenAsync();
+        public async Task<Category?> UpdateCategoryAsync(int id, Category updatedCategory)
+        {
+            using var connection = CreateConnection();
+            await connection.OpenAsync();
 
-        //     var sql = "SELECT id, label FROM Categories WHERE id = @id";
-        //     using var command = new NpgsqlCommand(sql, connection);
-        //     command.Parameters.AddWithValue("@id", id);
+            var updateSql = @"
+                UPDATE Categories
+                SET  label = @label
+                WHERE id = @id
+                RETURNING id, label";
 
-        //     using var reader = await command.ExecuteReaderAsync();
-        //     if (await reader.ReadAsync())
-        //     {
-        //         return new Post
-        //         {
-        //             Id = reader.GetInt32(0),
+            using var command = new NpgsqlCommand(updateSql, connection);
+            command.Parameters.AddWithValue("@id", id);
+            command.Parameters.AddWithValue("@label", updatedCategory.Label);
 
-        //         };
-        //     }
 
-        //     return null;
-        // }
+            using var reader = await command.ExecuteReaderAsync();
+            if (await reader.ReadAsync())
+            {
+                return new Category
+                {
+                    Id = reader.GetInt32(0),
+                    Label = reader.GetString(1),
+                };
+            }
+
+            return null;
+        }
     }
 
 }

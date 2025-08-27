@@ -8,7 +8,6 @@ namespace RareAPI.Endpoints
     {
         public static void MapCategoryEndpoints(this IEndpointRouteBuilder endpoints)
         {
-            // GET /categories
             endpoints.MapGet("/Categories", async (DatabaseService databaseService) =>
             {
                 try
@@ -22,13 +21,6 @@ namespace RareAPI.Endpoints
                 }
             });
 
-            // GET /posts/{id}
-            // endpoints.MapGet("/posts/{id:int}", async (int id, DatabaseService databaseService) =>
-            // {
-
-            // });
-
-            // POST /posts
             endpoints.MapPost("/Categories", async (Category postRequest, DatabaseService databaseService) =>
             {
                 try
@@ -48,29 +40,25 @@ namespace RareAPI.Endpoints
             });
 
             // DELETE /posts/{id}
-            // endpoints.MapDelete("/posts/{id:int}", async (int id, DatabaseService databaseService) =>
-            // {
-            //     try
-            //     {
-            //         var deleted = await databaseService.DeletePostAsync(id);
-            //         if (deleted)
-            //         {
-            //             return Results.NoContent();
-            //         }
+            endpoints.MapDelete("/Categories/{id:int}", async (int id, DatabaseService databaseService) =>
+            {
+                try
+                {
+                    var deleted = await databaseService.DeleteCategoryAsync(id);
+                    if (deleted)
+                    {
+                        return Results.NoContent();
+                    }
 
-            //         return Results.NotFound(new { message = "Post not found" });
-            //     }
-            //     catch (Exception ex)
-            //     {
-            //         return Results.Problem($"An error occurred: {ex.Message}");
-            //     }
-            // });
+                    return Results.NotFound(new { message = "Category not found" });
+                }
+                catch (Exception ex)
+                {
+                    return Results.Problem($"An error occurred: {ex.Message}");
+                }
+            });
 
-            // GET /users/{userId}/posts
-            // endpoints.MapGet("/users/{userId:int}/posts", async (int userId, DatabaseService databaseService) =>
-            // {
 
-            // });
         }
     }
 }
