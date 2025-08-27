@@ -59,6 +59,23 @@ namespace RareAPI.Endpoints
             });
 
 
+
+            endpoints.MapPut("/Categories/{id:int}", async (int id, Category updatedCategory, DatabaseService databaseService) =>
+            {
+                try
+                {
+                    var category = await databaseService.UpdateCategoryAsync(id, updatedCategory);
+                    if (category == null)
+                        return Results.NotFound(new { message = "Category not found" });
+                    return Results.Ok(category);
+                }
+                catch (Exception ex)
+                {
+                    return Results.Problem($"An error occurred: {ex.Message}");
+                }
+            });
+
+
         }
     }
 }

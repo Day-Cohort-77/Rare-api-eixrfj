@@ -38,5 +38,11 @@ namespace RareAPI.Services
         }
 
 
+        public async Task<Category?> UpdateCategoryAsync(int id, Category updatedCategory)
+        {
+            return await _databaseService.UpdateCategoryAsync(id, updatedCategory);
+        }
+
+
     }
 }
